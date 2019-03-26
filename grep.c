@@ -24,21 +24,17 @@ int main(int argc, char *argv[]) {
 		globp = "r";
 	}
 	zero = (unsigned *)malloc(nlall*sizeof(unsigned));
-	tfname = mktemp(tmpXXXXX);
 	init();
-	setjmp(savej);
 	commands();
 	quit(0);
 	return 0;
 }
-
 void commands(void) {
 	unsigned int *a1;
 	int c;
 	int temp;
 	char lastsep;
 	char *p1, *p2;
-	char t = "\t";
 	
 	for (;;) {
 	c = '\n';
@@ -49,7 +45,7 @@ void commands(void) {
 		if (c!=',' && c!=';')
 			break;
 		if (lastsep==',')
-			error(Q);
+		  error(Q);
 		if (a1==0) {
 			a1 = zero+1;
 			if (a1>dol)
@@ -82,10 +78,8 @@ void commands(void) {
 		continue;
 	case 'p':
 	case 'P':
-	        fname = strcat(file, ": ");
+	        printf("%s: ", file);
 		newline();
-		puts(fname);
-		putchr(t);
 		print();
 		continue;
 	case 'r':
@@ -127,11 +121,9 @@ void commands(void) {
 	}
 	error(Q);
 	}
-	}
-
+}
 void print(void) {
 	unsigned int *a1;
-
 	nonzero();
 	a1 = addr1;
 	do {
@@ -140,14 +132,13 @@ void print(void) {
 			putd();
 			putchr('\t');
 		}
-		puts(getline(*a1++));
+		puts(m_getline(*a1++));
 	} while (a1 <= addr2);
 	dot = addr2;
 	listf = 0;
 	listn = 0;
 	pflag = 0;
 }
-
 unsigned int *
 address(void) {
 	int sign;
@@ -180,7 +171,7 @@ address(void) {
 				if (execute(a))
 					break;
 				if (a==b)
-					error(Q);
+				  error(Q);
 			}
 			break;
 		default:
@@ -207,7 +198,6 @@ address(void) {
 	error(Q);
 	return 0;
 }
-
 int getnum(void) {
 	int r, c;
 
@@ -217,28 +207,23 @@ int getnum(void) {
 	peekc = c;
 	return (r);
 }
-
 void setwide(void) {
 	if (!given) {
 		addr1 = zero + (dol>zero);
 		addr2 = dol;
 	}
 }
-
 void setnoaddr(void) {
 	if (given)
-		error(Q);
+	  error(Q);
 }
-
 void nonzero(void) {
 	squeeze(1);
 }
-
 void squeeze(int i) {
 	if (addr1<zero+i || addr2>dol || addr1>addr2)
-		error(Q);
+	  error(Q);
 }
-
 void newline(void) {
 	int c;
 
@@ -255,32 +240,30 @@ void newline(void) {
 	}
 	error(Q);
 }
-
 void filename(int comm) {
 	char *p1, *p2;
 	int c;
-
 	count = 0;
 	c = getchr();
 	if (c=='\n' || c==EOF) {
 		p1 = savedfile;
 		if (*p1==0 && comm!='f')
-			error(Q);
+		  error(Q);
 		p2 = file;
 		while (*p2++ = *p1++)
 			;
 		return;
 	}
 	if (c!=' ')
-		error(Q);
+	  error(Q);
 	while ((c = getchr()) == ' ')
 		;
 	if (c=='\n')
-		error(Q);
+	  error(Q);
 	p1 = file;
 	do {
 		if (p1 >= &file[sizeof(file)-1] || c==' ' || c==EOF)
-			error(Q);
+		  error(Q);
 		*p1++ = c;
 	} while ((c = getchr()) != '\n');
 	*p1++ = 0;
@@ -291,23 +274,16 @@ void filename(int comm) {
 			;
 	}
 }
-
 void exfile(void) {
 	close(io);
 	io = -1;
-	if (vflag) {
-	  //putd();
-	  //putchr('\n');
-	}
 }
-
 void onintr(int n) {
 	signal(SIGINT, onintr);
 	putchr('\n');
 	lastc = '\n';
 	error(Q);
 }
-
 void onhup(int n) {
 	signal(SIGINT, SIG_IGN);
 	signal(SIGHUP, SIG_IGN);
@@ -321,7 +297,6 @@ void onhup(int n) {
 	fchange = 0;
 	quit(0);
 }
-
 void error(char *s) {
 	int c;
 
@@ -346,7 +321,6 @@ void error(char *s) {
 	}
 	longjmp(savej, 1);
 }
-
 int getchr(void) {
 	char c;
 	if (lastc=peekc) {
@@ -364,7 +338,6 @@ int getchr(void) {
 	lastc = c&0177;
 	return(lastc);
 }
-
 int getfile(void) {
 	int c;
 	char *lp, *fp;
@@ -400,7 +373,6 @@ int getfile(void) {
 	nextip = fp;
 	return(0);
 }
-
 void putfile(void) {
 	unsigned int *a1;
 	int n;
@@ -411,7 +383,7 @@ void putfile(void) {
 	fp = genbuf;
 	a1 = addr1;
 	do {
-		lp = getline(*a1++);
+		lp = m_getline(*a1++);
 		for (;;) {
 			if (--nib < 0) {
 				n = fp-genbuf;
@@ -435,7 +407,6 @@ void putfile(void) {
 		error(Q);
 	}
 }
-
 int append(int (*f)(void), unsigned int *a) {
 	unsigned int *a1, *a2, *rdot;
 	int nline, tl;
@@ -448,7 +419,7 @@ int append(int (*f)(void), unsigned int *a) {
 
 			nlall += 1024;
 			if ((zero = (unsigned *)realloc((char *)zero, nlall*sizeof(unsigned)))==NULL) {
-				error("MEM?");
+			  error("MEM?");
 				onhup(0);
 			}
 			dot += zero - ozero;
@@ -465,7 +436,6 @@ int append(int (*f)(void), unsigned int *a) {
 	}
 	return(nline);
 }
-
 void quit(int n) {
 	if (vflag && fchange && dol!=zero) {
 		fchange = 0;
@@ -474,7 +444,6 @@ void quit(int n) {
 	unlink(tfname);
 	exit(0);
 }
-
 void gdelete(void) {
 	unsigned int *a1, *a2, *a3;
 
@@ -494,9 +463,8 @@ void gdelete(void) {
 		dot = dol;
 	fchange = 1;
 }
-
 char *
-getline(unsigned int tl) {
+m_getline(unsigned int tl) {
 	char *bp, *lp;
 	int nl;
 
@@ -511,7 +479,6 @@ getline(unsigned int tl) {
 		}
 	return(linebuf);
 }
-
 int putline(void) {
 	char *bp, *lp;
 	int nl;
@@ -538,7 +505,6 @@ int putline(void) {
 	tline += (((lp-linebuf)+03)>>1)&077776;
 	return(nl);
 }
-
 char *
 getblock(unsigned int atl, int iof) {
 	int bno, off;
@@ -569,14 +535,12 @@ getblock(unsigned int atl, int iof) {
 	oblock = bno;
 	return(obuff+off);
 }
-
 void blkio(int b, char *buf, int (*iofcn)(int, char*, int)) {
 	lseek(tfile, (long)b*BLKSIZE, 0);
 	if ((*iofcn)(tfile, buf, BLKSIZE) != BLKSIZE) {
-		error(T);
+	  error(T);
 	}
 }
-
 void init(void) {
 	int *markp;
 
@@ -593,7 +557,6 @@ void init(void) {
 	tfile = open(tfname, 2);
 	dot = dol = zero;
 }
-
 void global(int k) {
 	char *gp;
 	int c;
@@ -601,17 +564,17 @@ void global(int k) {
 	char globuf[GBSIZE];
 
 	if (globp)
-		error(Q);
+	  error(Q);
 	setwide();
 	squeeze(dol>zero);
 	globp = strcat(regx, "\n");
 	if ((c=getchr())=='\n')
-		error(Q);
+	  error(Q);
 	compile(c);
 	gp = globuf;
 	while ((c = getchr()) != '\n') {
 		if (c==EOF)
-			error(Q);
+		  error(Q);
 		if (c=='\\') {
 			c = getchr();
 			if (c!='\n')
@@ -619,7 +582,7 @@ void global(int k) {
 		}
 		*gp++ = c;
 		if (gp >= &globuf[GBSIZE-2])
-			error(Q);
+		  error(Q);
 	}
 	if (gp == globuf)
 		*gp++ = 'p';
@@ -644,7 +607,6 @@ void global(int k) {
 		}
 	}
 }
-
 void compile(int eof) {
 	int c;
 	char *ep;
@@ -660,7 +622,7 @@ void compile(int eof) {
 	}
 	if (c == eof) {
 		if (*ep==0)
-			error(Q);
+		  error(Q);
 		return;
 	}
 	nbra = 0;
@@ -753,11 +715,9 @@ void compile(int eof) {
 		}
 	}
 }
-
 int execute(unsigned int *addr) {
 	char *p1, *p2;
 	int c;
-
 	for (c=0; c<NBRA; c++) {
 		braslist[c] = 0;
 		braelist[c] = 0;
@@ -770,7 +730,7 @@ int execute(unsigned int *addr) {
 	} else if (addr==zero)
 		return(0);
 	else
-		p1 = getline(*addr);
+		p1 = m_getline(*addr);
 	if (*p2==CCIRC) {
 		loc1 = p1;
 		return(advance(p1, p2+1));
@@ -795,66 +755,54 @@ int execute(unsigned int *addr) {
 	} while (*p1++);
 	return(0);
 }
-
 int advance(char *lp, char *ep) {
 	char *curlp;
 	int i;
-
 	for (;;) switch (*ep++) {
-
 	case CCHR:
 		if (*ep++ == *lp++)
 			continue;
 		return(0);
-
 	case CDOT:
 		if (*lp++)
 			continue;
 		return(0);
-
 	case CDOL:
 		if (*lp==0)
 			continue;
 		return(0);
-
 	case CEOF:
 		loc2 = lp;
 		return(1);
-
 	case CCL:
 		if (cclass(ep, *lp++, 1)) {
 			ep += *ep;
 			continue;
 		}
 		return(0);
-
 	case NCCL:
 		if (cclass(ep, *lp++, 0)) {
 			ep += *ep;
 			continue;
 		}
 		return(0);
-
 	case CBRA:
 		braslist[*ep++] = lp;
 		continue;
-
 	case CKET:
 		braelist[*ep++] = lp;
 		continue;
-
 	case CBACK:
 		if (braelist[i = *ep++]==0)
-			error(Q);
+		  error(Q);
 		if (backref(i, lp)) {
 			lp += braelist[i] - braslist[i];
 			continue;
 		}
 		return(0);
-
 	case CBACK|STAR:
 		if (braelist[i = *ep++] == 0)
-			error(Q);
+		  error(Q);
 		curlp = lp;
 		while (backref(i, lp))
 			lp += braelist[i] - braslist[i];
@@ -864,31 +812,25 @@ int advance(char *lp, char *ep) {
 			lp -= braelist[i] - braslist[i];
 		}
 		continue;
-
 	case CDOT|STAR:
 		curlp = lp;
 		while (*lp++)
 			;
-
 	case CCHR|STAR:
 		curlp = lp;
 		while (*lp++ == *ep)
 			;
 		ep++;
-
 	case CCL|STAR:
 	case NCCL|STAR:
 		curlp = lp;
 		while (cclass(ep, *lp++, ep[-1]==(CCL|STAR)))
 			;
 		ep += *ep;
-
-
 	default:
-		error(Q);
+	  error(Q);
 	}
 }
-
 int backref(int i, char *lp) {
 	char *bp;
 
@@ -898,7 +840,6 @@ int backref(int i, char *lp) {
 			return(1);
 	return(0);
 }
-
 int cclass(char *set, int c, int af) {
 	int n;
 
@@ -910,7 +851,6 @@ int cclass(char *set, int c, int af) {
 			return(af);
 	return(!af);
 }
-
 void putd(void) {
 	int r;
 
@@ -920,14 +860,11 @@ void putd(void) {
 		putd();
 	putchr(r + '0');
 }
-
 char	line[70];
 char	*linp	= line;
-
 void putchr(int ac) {
 	char *lp;
 	int c;
-
 	lp = linp;
 	c = ac;
 	if (listf) {
