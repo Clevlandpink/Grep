@@ -104,7 +104,7 @@ void compile(int eof);
 void error(char *s);
 int execute(unsigned int *addr);
 void exfile(void);
-void filename(int comm);
+void filename(void);
 void gdelete(void);
 int getchr(void);
 int getcopy(void);

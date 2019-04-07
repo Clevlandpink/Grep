@@ -17,92 +17,47 @@ int main(int argc, char *argv[]) {
 	  p1 = argv[1];
 	  p2 = savedfile;
 	  while (*p2++ = *p1++)
-	    if (p2 >= &savedfile[sizeof(savedfile)])
+	    if (p2 >= &file[sizeof(savedfile)])
 	      p2--;
-	  globp = "r";
 	}
 	else{
-	  printf("Ussage: <string> <files>\n");
+	  printf("Usage: <string> <files>\n");
 	  quit(0);
 	  }
 	zero = (unsigned *)malloc(nlall*sizeof(unsigned));
 	init();
-	commands();
+	for(;;){
+	  io = open(savedfile, 0);
+	  setwide();
+	  squeeze(0);
+	  ninbuf = 0;
+	  append(getfile, addr2);
+	  exfile();
+	  global(1);
+	  --fc;
+	  memset(linebuf, 0, sizeof(linebuf));
+	  memset(ibuff, 0, sizeof(ibuff));
+	  memset(obuff, 0, sizeof(obuff));
+	  if(fc < 1){
+	    exit(0);
+	  }
+	  else{
+	    p1 = filelist[iter];
+	    p2 = savedfile;
+	    while (*p2++ = *p1++)
+	      if (p2 >= &savedfile[sizeof(savedfile)])
+		p2--;
+	    if(fc > 1){
+	      ++iter;
+	    }
+	    globp = 0;
+	  }
+	}
 	quit(0);
 	return 0;
 }
-void commands(void) {
-	unsigned int *a1;
-	int c;
-	char lastsep;
-	char *p1, *p2;
-	
-	for (;;) {
-	c = '\n';
-	for (addr1 = 0;;) {
-		lastsep = c;
-		a1 = 0;
-		c = getchr();
-		if (c!=',' && c!=';')
-			break;
-	}
-	if (lastsep!='\n' && a1==0)
-		a1 = dol;
-	if ((addr2=a1)==0) {
-		given = 0;
-		addr2 = dot;	
-	}
-	if (addr1==0)
-		addr1 = addr2;
-	switch(c) {
-	case 'p':
-	        printf("%s: ", file);
-		newline();
-		print();
-		continue;
-	case 'r':
-		filename(c);
-		if ((io = open(file, 0)) < 0) {
-			lastc = '\n';
-			error(file);
-		}
-		setwide();
-		squeeze(0);
-		ninbuf = 0;
-		c = zero != dol;
-		append(getfile, addr2);
-		exfile();
-		fchange = c;
-		global(1);
-		--fc;
-		memset(linebuf, 0, sizeof(linebuf));
-		memset(ibuff, 0, sizeof(ibuff));
-		memset(obuff, 0, sizeof(obuff));
-		if(fc < 1){
-		exit(0);
-		}
-		else{
-		  p1 = filelist[iter];
-		  p2 = savedfile;
-		  while (*p2++ = *p1++)
-		    if (p2 >= &savedfile[sizeof(savedfile)])
-		      p2--;
-		  globp = "r";
-		  if(fc > 1){
-		    ++iter;
-		  }
-		}  
-		continue;
-	case EOF:
-		return;
-
-	}
-	error(Q);
-	}
-}
 void print(void) {
 	unsigned int *a1;
-	nonzero();
 	a1 = addr1;
 	do {
 		if (listn) {
@@ -131,9 +86,6 @@ void setnoaddr(void) {
 	if (given)
 	  error(Q);
 }
-void nonzero(void) {
-	squeeze(1);
-}
 void squeeze(int i) {
 	if (addr1<zero+i || addr2>dol || addr1>addr2)
 	  error(Q);
@@ -143,21 +95,6 @@ void newline(void) {
 	if ((c = getchr()) == '\n' || c == EOF)
 		return;
 	error(Q);
-}
-void filename(int comm) {
-	char *p1, *p2;
-	int c;
-	count = 0;
-	c = getchr();
-	if (c=='\n' || c==EOF) {
-		p1 = savedfile;
-		if (*p1==0 && comm!='f')
-		  error(Q);
-		p2 = file;
-		while (*p2++ = *p1++)
-			;
-		return;
-	}
 }
 void exfile(void) {
 	close(io);
@@ -476,7 +413,14 @@ void global(int k) {
 			*a1 &= ~01;
 			dot = a1;
 			globp = globuf;
-			commands();
+			addr1 = 0;
+			a1 = 0;
+			addr2 = a1;
+			given = 0;
+			addr2 = dot;
+			addr1 = addr2;
+			printf("%s: ", savedfile);
+			print();
 			a1 = zero;
 		}
 	}
