@@ -54,10 +54,6 @@ void setnoaddr(void) {
 void squeeze(int i) {
   if (addr1<zero+i || addr2>dol || addr1>addr2){error(Q);}
 }
-void newline(void) {
-	int c;
-	if ((c = getchr()) == '\n' || c == EOF){return;} error(Q);
-}
 void exfile(void) {
 	close(io); io = -1;
 }
@@ -80,7 +76,8 @@ void error(char *s) {
 	globp = 0; peekc = lastc;
 	if(lastc){while ((c = getchr()) != '\n' && c != EOF);}
 	if (io > 0){close(io); io = -1;}
-	longjmp(savej, 1);
+	//longjmp(savej, 1);
+	quit(1);
 }
 int getchr(void) {
 	char c;
@@ -274,8 +271,7 @@ void compile(int eof) {
 	ep = expbuf; bracketp = bracket;
 	if ((c = getchr()) == '\n') {peekc = c; c = eof;}
 	if (c == eof) {
-	  if (*ep==0){error(Q);}
-	  return;
+	  quit(1);
 	}
 	nbra = 0;
 	if (c=='^') {c = getchr(); *ep++ = CCIRC;}
