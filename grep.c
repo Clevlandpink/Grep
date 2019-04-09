@@ -1,13 +1,23 @@
 #include "grep.h"
+int vflag= 1;int oflag;int listf;int listn;int col;char	*globp;
+int tfile = -1;int tline;char *tfname;char *loc1;char *loc2;
+char ibuff[BLKSIZE];int	iblock = -1;char obuff[BLKSIZE];int oblock = -1;
+int ichanged;int nleft;char WRERR[] = "WRITE ERROR";int	names[26];int anymarks;
+char *braslist[NBRA];char *braelist[NBRA];int nbra;int	subnewa;int subolda;
+int  fchange;int wrapp;int bpagesize = 20;unsigned nlall = 128;int peekc;int lastc;char	savedfile[FNSIZE];char regx[ESIZE+4];
+char *filelist[FNSIZE];int iter = 1;char linebuf[LBSIZE];char	expbuf[ESIZE+4];int	given;unsigned int	*addr1, *addr2;
+unsigned int *dot, *dol, *zero;char genbuf[LBSIZE];long	count;char *nextip;
+char *linebp;int ninbuf;int fc;int io;int pflag;char Q[] = "";char T[]	= "TMP";jmp_buf	savej;
+
 int main(int argc, char *argv[]) {
         char *p1, *p2;
 	argv++; fc = argc-2;
 	for(int i = 0; i < fc; ++i){filelist[i] = argv[i+1];}
 	if (argc>2) {
 	  p1 = argv[0]; p2 = regx;
-	  while (*p2++ = *p1++){if (p2 >= &regx[sizeof(regx)]){p2--;}}	  
+	  while (*p2++ = *p1++){if (p2 >= &regx[sizeof(regx)]){p2--;}}
 	  p1 = argv[1]; p2 = savedfile;
-	  while (*p2++ = *p1++){if (p2 >= &file[sizeof(savedfile)]){p2--;}}
+	  while (*p2++ = *p1++){if (p2 >= &savedfile[sizeof(savedfile)]){p2--;}}
 	}
 	else{
 	  printf("Usage: <string> <files>\n");
@@ -227,13 +237,14 @@ void init(void) {
 	close(creat(tfname, 0600)); tfile = open(tfname, 2); dot = dol = zero;
 }
 void global(int k) {
-	char *gp;
+        char *gp;
 	int c;
 	unsigned int *a1;
-	char globuf[GBSIZE];
+	char globuf[GBSIZE]; char tmp[GBSIZE] = "/";
 	if (globp){error(Q);}
 	setwide(); squeeze(dol>zero);
 	globp = strcat(regx, "\n");
+	globp = strcat(tmp, regx);
 	if ((c=getchr())=='\n'){error(Q);}
 	compile(c); gp = globuf;
 	while ((c = getchr()) != '\n') {

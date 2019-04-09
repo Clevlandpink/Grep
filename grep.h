@@ -23,33 +23,9 @@
 #define	CBACK	14
 #define	CCIRC	15
 #define	STAR	01
-char	Q[]	= "";
-char	T[]	= "TMP";
 #define	READ	0
 #define	WRITE	1
-int	peekc;
-int	lastc;
-char	savedfile[FNSIZE];
-char    regx[ESIZE+4];
-char    sregx[ESIZE+4] = "/";
-char	file[FNSIZE];
-char    *fname;
-char    *filelist[FNSIZE];
-int     iter = 1;
-char	linebuf[LBSIZE];
-char	rhsbuf[LBSIZE/2];
-char	expbuf[ESIZE+4];
-int	given;
-unsigned int	*addr1, *addr2;
-unsigned int	*dot, *dol, *zero;
-char	genbuf[LBSIZE];
-long	count;
-char	*nextip;
-char	*linebp;
-int	ninbuf;
-int     fc;
-int	io;
-int	pflag;
+
 long	lseek(int, long, int);
 int	open(char *, int);
 int	creat(char *, int);
@@ -59,37 +35,7 @@ int	close(int);
 int	fork(void);
 int	wait(int *);
 int	unlink(char *);
-int	vflag	= 1;
-int	oflag;
-int	listf;
-int	listn;
-int	col;
-char	*globp;
-int	tfile	= -1;
-int	tline;
-char	*tfname;
-char	*loc1;
-char	*loc2;
-char	ibuff[BLKSIZE];
-int	iblock	= -1;
-char	obuff[BLKSIZE];
-int	oblock	= -1;
-int	ichanged;
-int	nleft;
-char	WRERR[]	= "WRITE ERROR";
-int	names[26];
-int	anymarks;
-char	*braslist[NBRA];
-char	*braelist[NBRA];
-int	nbra;
-int	subnewa;
-int	subolda;
-int	fchange;
-int	wrapp;
-int	bpagesize = 20;
-unsigned nlall = 128;
 char	*mktemp(char *);
-char	tmpXXXXX[50] = "/tmp/eXXXXX";
 char *getblock(unsigned int atl, int iof);
 char *m_getline(unsigned int tl);
 char *place(char *sp, char *l1, char *l2);
@@ -125,9 +71,4 @@ void rdelete(unsigned int *ad1, unsigned int *ad2);
 void setwide(void);
 void setnoaddr(void);
 void squeeze(int i);
-jmp_buf	savej;
 typedef void	(*SIG_TYP)(int);
-SIG_TYP	oldhup;
-SIG_TYP	oldquit;
-#define	SIGHUP	1	/* hangup */
-#define	SIGQUIT	3	/* quit (ASCII FS) */
