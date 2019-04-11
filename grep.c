@@ -15,9 +15,9 @@ int main(int argc, char *argv[]) {
 	for(int i = 0; i < fc; ++i){filelist[i] = argv[i+1];}
 	if (argc>2) {
 	  p1 = argv[0], p2 = regx;
-	  while (*p2++ = *p1++){if (p2 >= &regx[sizeof(regx)]){p2--;}}
+	  while ((*p2++ = *p1++)){if (p2 >= &regx[sizeof(regx)]){p2--;}}
 	  p1 = argv[1], p2 = savedfile;
-	  while (*p2++ = *p1++){if (p2 >= &savedfile[sizeof(savedfile)]){p2--;}}
+	  while ((*p2++ = *p1++)){if (p2 >= &savedfile[sizeof(savedfile)]){p2--;}}
 	}
 	else{
 	  printf("Usage: <string> <files>\n");
@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
 	  if(fc < 1){exit(0);}
 	  else{
 	    p1 = filelist[iter], p2 = savedfile;
-	    while (*p2++ = *p1++){if (p2 >= &savedfile[sizeof(savedfile)]){p2--;}}
+	    while ((*p2++ = *p1++)){if (p2 >= &savedfile[sizeof(savedfile)]){p2--;}}
 	    if(fc > 1){++iter;}
 	    globp = 0;
 	  }
@@ -102,7 +102,7 @@ void error(char *s) {
 }
 int getchr(void) {
 	char c;
-	if (lastc=peekc) {
+	if ((lastc=peekc)) {
 		peekc = 0;
 		return(lastc);
 	}
@@ -120,19 +120,21 @@ int getfile(void) {
 	char *lp, *fp;
 	lp = linebuf, fp = nextip;
 	do {
-		if (--ninbuf < 0) {
-			if ((ninbuf = read(io, genbuf, LBSIZE)-1) < 0)
-				if (lp>linebuf) {puts("'\\n' appended"); *genbuf = '\n';}
-				else{return(EOF);}
-			fp = genbuf;
-			while(fp < &genbuf[ninbuf]) {if (*fp++ & 0200){break;}}
-			fp = genbuf;
-		}
-		c = *fp++;
-		if (c=='\0'){continue;}
-		if (c&0200 || lp >= &linebuf[LBSIZE]) {lastc = '\n';
-		  error(Q);}
-		*lp++ = c, count++;
+	  if (--ninbuf < 0) {
+	    if ((ninbuf = read(io, genbuf, LBSIZE)-1) < 0){
+	      if (lp>linebuf) {puts("'\\n' appended"); *genbuf = '\n';}
+	      else{return(EOF);}
+	    }
+	    fp = genbuf;
+	    while(fp < &genbuf[ninbuf]) {if (*fp++ & 0200){break;}}
+	    fp = genbuf;
+		  
+	  }
+	  c = *fp++;
+	  if (c=='\0'){continue;}
+	  if (c&0200 || lp >= &linebuf[LBSIZE]) {lastc = '\n';
+	    error(Q);}
+	  *lp++ = c, count++;
 	} while (c != '\n');
 	*--lp = 0, nextip = fp;
 	return(0);
@@ -204,7 +206,7 @@ char *m_getline(unsigned int tl) {
 	char *bp, *lp;
 	int nl;
 	lp = linebuf, bp = getblock(tl, READ), nl = nleft, tl &= ~((BLKSIZE/2)-1);
-	while (*lp++ = *bp++){if (--nl == 0) {bp = getblock(tl+=(BLKSIZE/2), READ);
+	while ((*lp++ = *bp++)){if (--nl == 0) {bp = getblock(tl+=(BLKSIZE/2), READ);
 	    nl = nleft;}}
 	return(linebuf);
 }
@@ -213,7 +215,7 @@ int putline(void) {
 	int nl;
 	unsigned int tl;
 	fchange = 1, lp = linebuf, tl = tline, bp = getblock(tl, WRITE), nl = nleft, tl &= ~((BLKSIZE/2)-1);
-	while (*bp = *lp++) {
+	while ((*bp = *lp++)) {
 		if (*bp++ == '\n') {
 		  *--bp = 0, linebp = lp;
 			break;
@@ -298,15 +300,13 @@ void compile(int eof) {
 	char bracket[NBRA], *bracketp;
 	ep = expbuf, bracketp = bracket;
 	if ((c = getchr()) == '\n') {peekc = c; c = eof;}
-	if (c == eof) {
-	  quit(1);
-	}
+	if (c == eof) {quit(1);}
 	nbra = 0;
-	if (c=='^') {c = getchr(); *ep++ = CCIRC;}
+	if (c=='^') {c = getchr(), *ep++ = CCIRC;}
 	peekc = c, lastep = 0;
 	for (;;) {
 		c = getchr();
-		if (c == '\n') {peekc = c; c = eof;}
+		if (c == '\n') {peekc = c, c = eof;}
 		if (c==eof) {
 			*ep++ = CEOF;
 			return;
