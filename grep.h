@@ -1,41 +1,19 @@
-#include <signal.h>
 #include <setjmp.h>
-#include <string.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-#define	BLKSIZE	4096
-#define	NBLK	2047
-#define	FNSIZE	128
-#define	LBSIZE	4096
-#define	ESIZE	256
-#define	GBSIZE	256
-#define	NBRA	5
-#define	KSIZE	9
-#define	CBRA	1
-#define	CCHR	2
-#define	CDOT	4
-#define	CCL	6
-#define	NCCL	8
-#define	CDOL	10
-#define	CEOF	11
-#define	CKET	12
-#define	CBACK	14
-#define	CCIRC	15
-#define	STAR	01
-#define	READ	0
-#define	WRITE	1
-
-long	lseek(int, long, int);
-int	open(char *, int);
-int	creat(char *, int);
-int	read(int, char*, int);
-int	write(int, char*, int);
-int	close(int);
-int	fork(void);
-int	wait(int *);
-int	unlink(char *);
-char	*mktemp(char *);
+#include <string.h>
+const int BLKSIZE = 4096,NBLK = 2047,FNSIZE = 128,LBSIZE = 4096,ESIZE = 256,GBSIZE = 256,NBRA = 5,KSIZE = 9,CBRA = 1,CCHR = 2,CDOT = 4,CCL = 6,NCCL = 8,CDOL = 10,CEOF = 11,CKET = 12,CBACK = 14,CCIRC = 15,STAR = 01,READ = 0, WRITE = 1;
+long lseek(int, long, int);
+int open(char *, int);
+int creat(char *, int);
+int read(int, char *, int);
+int write(int, char *, int);
+int close(int);
+int fork(void);
+int wait(int *);
+int unlink(char *);
+char *mktemp(char *);
 char *getblock(unsigned int atl, int iof);
 char *m_getline(unsigned int tl);
 char *place(char *sp, char *l1, char *l2);
@@ -43,7 +21,7 @@ void add(int i);
 int advance(char *lp, char *ep);
 int append(int (*f)(void), unsigned int *a);
 int backref(int i, char *lp);
-void blkio(int b, char *buf, int (*iofcn)(int, char*, int));
+void blkio(int b, char *buf, int (*iofcn)(int, char *, int));
 int cclass(char *set, int c, int af);
 void commands(void);
 void compile(int eof);
@@ -71,4 +49,4 @@ void rdelete(unsigned int *ad1, unsigned int *ad2);
 void setwide(void);
 void setnoaddr(void);
 void squeeze(int i);
-typedef void	(*SIG_TYP)(int);
+typedef void (*SIG_TYP)(int);
